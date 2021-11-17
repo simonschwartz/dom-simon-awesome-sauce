@@ -1,15 +1,16 @@
-extern crate tuix;
-use tuix::*;
+use orbtk::prelude::*;
 
 fn main() {
-	let app = Application::new(
-		WindowDescription::new()
-			.with_title("Counter")
-			.with_inner_size(400, 100),
-		|state, window| {
-			println!("hello world");
-		},
-	);
-
-	app.run();
+	Application::new()
+		.window(|ctx| {
+			Window::new()
+				.title("Dom Simon Awesome Sauce")
+				.position((100.0, 100.0))
+				.size(420.0, 730.0)
+                .resizeable(true)
+				.child(TextBlock::new().text("OrbTk").build(ctx))
+                .child(Button::new().text("goodbye").attach(Grid::column(6)).min_size(48.0, 48).build(ctx))
+				.build(ctx)
+		})
+		.run();
 }
