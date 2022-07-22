@@ -1,8 +1,8 @@
-use druid::{
-	theme, AppLauncher, Color, Data, Lens, LocalizedString, RenderContext, Widget, WidgetExt,
-	FontDescriptor, WindowDesc,
-};
 use druid::widget::{CrossAxisAlignment, Flex, Label, Painter};
+use druid::{
+	theme, AppLauncher, Color, Data, FontDescriptor, Lens, LocalizedString, RenderContext, Widget,
+	WidgetExt, WindowDesc,
+};
 
 #[derive(Debug, Clone, Data, PartialEq)]
 enum LetterState {
@@ -160,7 +160,11 @@ fn letter_key(letter: char) -> impl Widget<WobbleState> {
 		ctx.fill(bounds, &Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF));
 
 		if ctx.is_hot() {
-			ctx.stroke(bounds.inset(-0.5), &Color::rgba8(0x00, 0x00, 0x00, 0x44), 1.0);
+			ctx.stroke(
+				bounds.inset(-0.5),
+				&Color::rgba8(0x00, 0x00, 0x00, 0x44),
+				1.0,
+			);
 		}
 
 		if ctx.is_active() {
@@ -183,7 +187,11 @@ fn button(label: String) -> impl Widget<WobbleState> {
 		ctx.fill(bounds, &Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF));
 
 		if ctx.is_hot() {
-			ctx.stroke(bounds.inset(-0.5), &Color::rgba8(0x00, 0x00, 0x00, 0x44), 1.0);
+			ctx.stroke(
+				bounds.inset(-0.5),
+				&Color::rgba8(0x00, 0x00, 0x00, 0x44),
+				1.0,
+			);
 		}
 
 		if ctx.is_active() {
@@ -242,7 +250,7 @@ fn build_layout() -> impl Widget<WobbleState> {
 				.with_spacer(letter_grid_space)
 				.with_flex_child(letter_box(" ".to_string()), letter_space)
 				.with_spacer(letter_grid_space),
-				letter_space
+			letter_space,
 		)
 		.with_spacer(letter_grid_space)
 		.with_flex_child(
@@ -258,7 +266,7 @@ fn build_layout() -> impl Widget<WobbleState> {
 				.with_spacer(letter_grid_space)
 				.with_flex_child(letter_box(" ".to_string()), letter_space)
 				.with_spacer(letter_grid_space),
-				letter_space
+			letter_space,
 		)
 		.with_spacer(letter_grid_space)
 		.with_flex_child(
@@ -274,7 +282,7 @@ fn build_layout() -> impl Widget<WobbleState> {
 				.with_spacer(letter_grid_space)
 				.with_flex_child(letter_box(" ".to_string()), letter_space)
 				.with_spacer(letter_grid_space),
-				letter_space
+			letter_space,
 		)
 		.with_spacer(letter_grid_space)
 		.with_flex_child(
@@ -290,7 +298,7 @@ fn build_layout() -> impl Widget<WobbleState> {
 				.with_spacer(letter_grid_space)
 				.with_flex_child(letter_box(" ".to_string()), letter_space)
 				.with_spacer(letter_grid_space),
-				letter_space
+			letter_space,
 		)
 		.with_spacer(letter_grid_space)
 		.with_flex_child(
@@ -306,7 +314,7 @@ fn build_layout() -> impl Widget<WobbleState> {
 				.with_spacer(letter_grid_space)
 				.with_flex_child(letter_box(" ".to_string()), letter_space)
 				.with_spacer(letter_grid_space),
-				letter_space
+			letter_space,
 		)
 		.with_spacer(letter_grid_space)
 		.with_flex_child(
@@ -322,7 +330,7 @@ fn build_layout() -> impl Widget<WobbleState> {
 				.with_spacer(letter_grid_space)
 				.with_flex_child(letter_box(" ".to_string()), letter_space)
 				.with_spacer(letter_grid_space),
-				letter_space
+			letter_space,
 		)
 		.with_flex_spacer(0.2)
 		.with_flex_child(
@@ -400,9 +408,7 @@ pub fn main() {
 	let window = WindowDesc::new(build_layout)
 		.window_size((500., 800.))
 		.resizable(true)
-		.title(
-			LocalizedString::new("app-title").with_placeholder("wobble"),
-		);
+		.title(LocalizedString::new("app-title").with_placeholder("wobble"));
 
 	let calc_state = WobbleState {
 		line1: (
