@@ -1,7 +1,7 @@
 use druid::widget::{CrossAxisAlignment, Flex, Label, Painter};
 use druid::{
-	theme, AppLauncher, Color, Data, FontDescriptor, Lens, LocalizedString, RenderContext, Widget,
-	WidgetExt, WindowDesc,
+	theme, AppLauncher, Color, Data, FontDescriptor, FontFamily, Lens, LocalizedString,
+	RenderContext, Widget, WidgetExt, WindowDesc,
 };
 
 #[derive(Debug, Clone, Data, PartialEq)]
@@ -458,7 +458,10 @@ pub fn main() {
 	AppLauncher::with_window(window)
 		.use_simple_logger()
 		.configure_env(|env, _| {
-			env.set(theme::UI_FONT, FontDescriptor::default().with_size(12.0));
+			env.set(
+				theme::UI_FONT,
+				FontDescriptor::new(FontFamily::SYSTEM_UI).with_size(12.0),
+			);
 			env.set(theme::LABEL_COLOR, Color::rgba8(0x00, 0x00, 0x00, 0xFF));
 			env.set(druid::theme::BACKGROUND_LIGHT, Color::WHITE);
 			env.set(druid::theme::BACKGROUND_DARK, Color::WHITE);
