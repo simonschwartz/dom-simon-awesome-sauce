@@ -457,12 +457,12 @@ pub fn main() {
 
 	AppLauncher::with_window(window)
 		.use_simple_logger()
-		// .configure_env(|env, _| {
-		// 	env.set(theme::UI_FONT, FontDescriptor::default().with_size(12.0));
-		// 	env.set(theme::LABEL_COLOR, Color::rgba8(0x00, 0x00, 0x00, 0xFF));
-		// 	env.set(druid::theme::BACKGROUND_LIGHT, Color::WHITE);
-		// 	env.set(druid::theme::BACKGROUND_DARK, Color::WHITE);
-		// })
+		.configure_env(|env, _| {
+			env.set(theme::UI_FONT, FontDescriptor::default().with_size(12.0));
+			env.set(theme::LABEL_COLOR, Color::rgba8(0x00, 0x00, 0x00, 0xFF));
+			env.set(druid::theme::BACKGROUND_LIGHT, Color::WHITE);
+			env.set(druid::theme::BACKGROUND_DARK, Color::WHITE);
+		})
 		.launch(calc_state)
 		.expect("launch failed");
 }
