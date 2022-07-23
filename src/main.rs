@@ -155,47 +155,40 @@ struct WobbleState {
 
 fn letter_key(letter: char) -> impl Widget<WobbleState> {
 	let rect = Painter::new(|ctx, _, _| {
-		let bounds = ctx.size().to_rect();
+		let bounds = ctx.size().to_rect().to_rounded_rect(4.0);
 
 		ctx.fill(bounds, &Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF));
+		ctx.stroke(bounds, &Color::rgba8(0x00, 0x00, 0x00, 0x55), 1.0);
 
 		if ctx.is_hot() {
-			ctx.stroke(
-				bounds.inset(-0.5),
-				&Color::rgba8(0x00, 0x00, 0x00, 0x44),
-				1.0,
-			);
+			ctx.fill(bounds, &Color::rgba8(0xEE, 0xEE, 0xEE, 0xFF));
 		}
 
 		if ctx.is_active() {
-			ctx.fill(bounds, &Color::rgba8(0x00, 0x71, 0x00, 0x88));
+			ctx.fill(bounds, &Color::rgba8(0x00, 0xFF, 0x00, 0xFF));
 		}
 	});
 
-	Label::new(format!("{}", letter))
+	Label::new(format!("{}", letter.to_uppercase()))
 		.with_text_size(24.0)
 		.center()
 		.background(rect)
 		.expand()
-		.on_click(move |_ctx, data: &mut WobbleState, _env| {})
+		.on_click(move |_ctx, _data: &mut WobbleState, _env| {})
 }
 
 fn button(label: String) -> impl Widget<WobbleState> {
 	let rect = Painter::new(|ctx, _, _| {
-		let bounds = ctx.size().to_rect();
+		let bounds = ctx.size().to_rect().to_rounded_rect(2.0);
 
-		ctx.fill(bounds, &Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF));
+		ctx.fill(bounds, &Color::rgba8(0xAA, 0xAA, 0xAA, 0x99));
 
 		if ctx.is_hot() {
-			ctx.stroke(
-				bounds.inset(-0.5),
-				&Color::rgba8(0x00, 0x00, 0x00, 0x44),
-				1.0,
-			);
+			ctx.stroke(bounds, &Color::rgba8(0x00, 0x00, 0x00, 0x44), 1.0);
 		}
 
 		if ctx.is_active() {
-			ctx.fill(bounds, &Color::rgb8(0x00, 0x71, 0x00));
+			ctx.fill(bounds, &Color::rgba8(0x00, 0xFF, 0x00, 0xFF));
 		}
 	});
 
@@ -204,18 +197,26 @@ fn button(label: String) -> impl Widget<WobbleState> {
 		.center()
 		.background(rect)
 		.expand()
-		.on_click(move |_ctx, data: &mut WobbleState, _env| {})
+		.on_click(move |_ctx, _data: &mut WobbleState, _env| {})
 }
 
-fn letter_box(label: String) -> impl Widget<WobbleState> {
-	let rect = Painter::new(|ctx, _, _| {
+fn letter_box(label: String, state: LetterState) -> impl Widget<WobbleState> {
+	let rect = Painter::new(move |ctx, _, _| {
 		let bounds = ctx.size().to_rect();
-		ctx.fill(bounds, &Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF));
-		ctx.stroke(bounds, &Color::rgba8(0x00, 0x00, 0x00, 0x22), 1.0);
+		let (bg, color) = match &state {
+			LetterState::Empty => (Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF), Color::BLACK),
+			LetterState::Input => (Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF), Color::BLACK),
+			LetterState::NotFound => (Color::rgba8(0xAA, 0xAA, 0xAA, 0xFF), Color::BLACK),
+			LetterState::WrongSpot => (Color::rgba8(0xFF, 0xFF, 0x00, 0xFF), Color::BLACK),
+			LetterState::Correct => (Color::rgba8(0x00, 0xFF, 0x00, 0xFF), Color::BLACK),
+		};
+		ctx.fill(bounds, &bg);
+		ctx.stroke(bounds, &color, 1.0);
 	});
 
-	Label::new(format!("{}", label))
+	Label::new(format!("{}", label.to_uppercase()))
 		.with_text_size(30.0)
+		.with_text_color(Color::BLACK)
 		.center()
 		.background(rect)
 		.expand()
@@ -224,7 +225,7 @@ fn letter_box(label: String) -> impl Widget<WobbleState> {
 fn build_layout() -> impl Widget<WobbleState> {
 	let heading = Label::new("wobble")
 		.with_text_size(32.0)
-		.with_text_color(Color::rgb8(0xFF, 0xFF, 0xFF))
+		.with_text_color(Color::BLACK)
 		.center()
 		.padding(5.0);
 
@@ -240,15 +241,30 @@ fn build_layout() -> impl Widget<WobbleState> {
 		.with_flex_child(
 			Flex::row()
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box("w".to_string(), LetterState::NotFound),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box("o".to_string(), LetterState::Correct),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box("b".to_string(), LetterState::WrongSpot),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box("b".to_string(), LetterState::NotFound),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box("l".to_string(), LetterState::Correct),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space),
 			letter_space,
 		)
@@ -256,15 +272,30 @@ fn build_layout() -> impl Widget<WobbleState> {
 		.with_flex_child(
 			Flex::row()
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space),
 			letter_space,
 		)
@@ -272,15 +303,30 @@ fn build_layout() -> impl Widget<WobbleState> {
 		.with_flex_child(
 			Flex::row()
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space),
 			letter_space,
 		)
@@ -288,15 +334,30 @@ fn build_layout() -> impl Widget<WobbleState> {
 		.with_flex_child(
 			Flex::row()
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space),
 			letter_space,
 		)
@@ -304,15 +365,30 @@ fn build_layout() -> impl Widget<WobbleState> {
 		.with_flex_child(
 			Flex::row()
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space),
 			letter_space,
 		)
@@ -320,21 +396,37 @@ fn build_layout() -> impl Widget<WobbleState> {
 		.with_flex_child(
 			Flex::row()
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space)
-				.with_flex_child(letter_box(" ".to_string()), letter_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty),
+					letter_space,
+				)
 				.with_spacer(letter_grid_space),
 			letter_space,
 		)
 		.with_flex_spacer(0.2)
 		.with_flex_child(
 			Flex::row()
+				.with_spacer(letter_grid_space)
 				.with_flex_child(letter_key('q'), key_space)
 				.with_spacer(key_space)
 				.with_flex_child(letter_key('w'), key_space)
@@ -353,7 +445,8 @@ fn build_layout() -> impl Widget<WobbleState> {
 				.with_spacer(key_space)
 				.with_flex_child(letter_key('o'), key_space)
 				.with_spacer(key_space)
-				.with_flex_child(letter_key('p'), key_space),
+				.with_flex_child(letter_key('p'), key_space)
+				.with_spacer(letter_grid_space),
 			0.3,
 		)
 		.with_spacer(1.0)
@@ -412,11 +505,11 @@ pub fn main() {
 
 	let calc_state = WobbleState {
 		line1: (
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
+			('w', LetterState::NotFound),
+			('o', LetterState::Correct),
+			('b', LetterState::WrongSpot),
+			('b', LetterState::NotFound),
+			('l', LetterState::Correct),
 		),
 		line2: (
 			(' ', LetterState::Empty),
@@ -462,9 +555,8 @@ pub fn main() {
 				theme::UI_FONT,
 				FontDescriptor::new(FontFamily::SYSTEM_UI).with_size(12.0),
 			);
-			env.set(theme::LABEL_COLOR, Color::rgba8(0x00, 0x00, 0x00, 0xFF));
-			env.set(druid::theme::BACKGROUND_LIGHT, Color::WHITE);
-			env.set(druid::theme::BACKGROUND_DARK, Color::WHITE);
+			env.set(theme::LABEL_COLOR, Color::BLACK);
+			env.set(druid::theme::WINDOW_BACKGROUND_COLOR, Color::WHITE);
 		})
 		.launch(calc_state)
 		.expect("launch failed");
