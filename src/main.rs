@@ -7,6 +7,7 @@ use druid::{
 #[derive(Debug, Clone, Data, PartialEq)]
 enum LetterState {
 	Empty,
+	Set,
 	Input,
 	NotFound,
 	WrongSpot,
@@ -135,7 +136,12 @@ fn letter_key(letter: char) -> impl Widget<WobbleState> {
 		.center()
 		.background(rect)
 		.expand()
-		.on_click(move |_ctx, _data: &mut WobbleState, _env| {})
+		.on_click(move |_ctx, data: &mut WobbleState, _| {
+			// call function to analyze data.guesses and return (guess_word,guess_letter) coordinates
+			let guess_word = 1;
+			let guess_letter = 1;
+			data.guesses[guess_word][guess_letter].0 = letter;
+		})
 }
 
 fn button(label: String) -> impl Widget<WobbleState> {
@@ -161,17 +167,21 @@ fn button(label: String) -> impl Widget<WobbleState> {
 		.on_click(move |_ctx, _data: &mut WobbleState, _env| {})
 }
 
-fn letter_box(word: usize, letter: usize) -> impl Widget<WobbleState> {
+fn letter_box(guess_word: usize, guess_letter: usize) -> impl Widget<WobbleState> {
 	let rect = Painter::new(move |ctx, guesses: &[Guess; 6], _| {
 		let bounds = ctx.size().to_rect();
-		let (bg, color) = match &guesses[word][letter].1 {
+		let (bg, color) = match &guesses[guess_word][guess_letter].1 {
 			LetterState::Empty => (
+				Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF),
+				Color::rgba8(0x00, 0x00, 0x00, 0x33),
+			),
+			LetterState::Set => (
 				Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF),
 				Color::rgba8(0x00, 0x00, 0x00, 0x33),
 			),
 			LetterState::Input => (Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF), Color::BLACK),
 			LetterState::NotFound => (
-				Color::rgba8(0xAA, 0xAA, 0xAA, 0xFF),
+				Color::rgba8(0xAA, 0xAA, 0xAA, 0x55),
 				Color::rgba8(0x00, 0x00, 0x00, 0x33),
 			),
 			LetterState::WrongSpot => (
@@ -187,23 +197,29 @@ fn letter_box(word: usize, letter: usize) -> impl Widget<WobbleState> {
 		ctx.stroke(bounds, &color, 2.5);
 	});
 
-	Label::new(move |guesses: &[Guess; 6], _env: &_| format!("{}", guesses[word][letter].0.clone()))
-		.with_text_size(30.0)
-		.with_text_color(Color::BLACK)
-		.center()
-		.background(rect)
-		.expand()
-		.lens(WobbleState::guesses)
+	Label::new(move |guesses: &[Guess; 6], _env: &_| {
+		format!(
+			"{}",
+			guesses[guess_word][guess_letter].0.clone().to_uppercase()
+		)
+	})
+	.with_text_size(30.0)
+	.with_text_color(Color::BLACK)
+	.center()
+	.background(rect)
+	.expand()
+	.lens(WobbleState::guesses)
 }
 
 fn build_layout() -> impl Widget<WobbleState> {
 	let heading = Label::new("wobble")
-		.with_text_size(32.0)
+		.with_font(FontDescriptor::new(FontFamily::SERIF))
+		.with_text_size(60.0)
 		.with_text_color(Color::BLACK)
 		.center()
-		.padding(5.0);
+		.padding(10.0);
 
-	let letter_space = 1.0;
+	let letter_space = 0.5;
 	let letter_grid_space = 5.0;
 	let key_space = 0.3;
 
@@ -397,8 +413,8 @@ pub fn main() {
 				('l', LetterState::Correct),
 			],
 			[
+				('D', LetterState::Set),
 				(' ', LetterState::Input),
-				(' ', LetterState::Empty),
 				(' ', LetterState::Empty),
 				(' ', LetterState::Empty),
 				(' ', LetterState::Empty),
