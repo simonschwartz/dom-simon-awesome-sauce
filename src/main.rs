@@ -13,50 +13,11 @@ enum LetterState {
 	Correct,
 }
 
+type Guess = [(char, LetterState); 5];
+
 #[derive(Debug, Clone, Data, Lens)]
 struct WobbleState {
-	line1: (
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-	),
-	line2: (
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-	),
-	line3: (
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-	),
-	line4: (
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-	),
-	line5: (
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-	),
-	line6: (
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-		(char, LetterState),
-	),
+	guesses: [Guess; 6],
 }
 
 // #[derive(Clone, Data, Lens)]
@@ -200,7 +161,12 @@ fn button(label: String) -> impl Widget<WobbleState> {
 		.on_click(move |_ctx, _data: &mut WobbleState, _env| {})
 }
 
-fn letter_box(label: String, state: LetterState) -> impl Widget<WobbleState> {
+fn letter_box(
+	label: String,
+	state: LetterState,
+	word: usize,
+	letter: usize,
+) -> impl Widget<WobbleState> {
 	let rect = Painter::new(move |ctx, _, _| {
 		let bounds = ctx.size().to_rect();
 		let (bg, color) = match &state {
@@ -214,12 +180,13 @@ fn letter_box(label: String, state: LetterState) -> impl Widget<WobbleState> {
 		ctx.stroke(bounds, &color, 1.0);
 	});
 
-	Label::new(format!("{}", label.to_uppercase()))
+	Label::new(move |guesses: &[Guess; 6], _env: &_| format!("{}", guesses[word][letter].0.clone()))
 		.with_text_size(30.0)
 		.with_text_color(Color::BLACK)
 		.center()
 		.background(rect)
 		.expand()
+		.lens(WobbleState::guesses)
 }
 
 fn build_layout() -> impl Widget<WobbleState> {
@@ -242,58 +209,27 @@ fn build_layout() -> impl Widget<WobbleState> {
 			Flex::row()
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box("w".to_string(), LetterState::NotFound),
+					letter_box("w".to_string(), LetterState::NotFound, 0, 0),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box("o".to_string(), LetterState::Correct),
+					letter_box("o".to_string(), LetterState::Correct, 0, 1),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box("b".to_string(), LetterState::WrongSpot),
+					letter_box("b".to_string(), LetterState::WrongSpot, 0, 2),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box("b".to_string(), LetterState::NotFound),
+					letter_box("b".to_string(), LetterState::NotFound, 0, 3),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box("l".to_string(), LetterState::Correct),
-					letter_space,
-				)
-				.with_spacer(letter_grid_space),
-			letter_space,
-		)
-		.with_spacer(letter_grid_space)
-		.with_flex_child(
-			Flex::row()
-				.with_spacer(letter_grid_space)
-				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
-					letter_space,
-				)
-				.with_spacer(letter_grid_space)
-				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
-					letter_space,
-				)
-				.with_spacer(letter_grid_space)
-				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
-					letter_space,
-				)
-				.with_spacer(letter_grid_space)
-				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
-					letter_space,
-				)
-				.with_spacer(letter_grid_space)
-				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box("l".to_string(), LetterState::Correct, 0, 4),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space),
@@ -304,58 +240,27 @@ fn build_layout() -> impl Widget<WobbleState> {
 			Flex::row()
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 1, 0),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 1, 1),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 1, 2),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 1, 3),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
-					letter_space,
-				)
-				.with_spacer(letter_grid_space),
-			letter_space,
-		)
-		.with_spacer(letter_grid_space)
-		.with_flex_child(
-			Flex::row()
-				.with_spacer(letter_grid_space)
-				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
-					letter_space,
-				)
-				.with_spacer(letter_grid_space)
-				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
-					letter_space,
-				)
-				.with_spacer(letter_grid_space)
-				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
-					letter_space,
-				)
-				.with_spacer(letter_grid_space)
-				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
-					letter_space,
-				)
-				.with_spacer(letter_grid_space)
-				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 1, 4),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space),
@@ -366,27 +271,27 @@ fn build_layout() -> impl Widget<WobbleState> {
 			Flex::row()
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 2, 0),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 2, 1),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 2, 2),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 2, 3),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 2, 4),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space),
@@ -397,27 +302,89 @@ fn build_layout() -> impl Widget<WobbleState> {
 			Flex::row()
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 3, 0),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 3, 1),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 3, 2),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 3, 3),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space)
 				.with_flex_child(
-					letter_box(" ".to_string(), LetterState::Empty),
+					letter_box(" ".to_string(), LetterState::Empty, 3, 4),
+					letter_space,
+				)
+				.with_spacer(letter_grid_space),
+			letter_space,
+		)
+		.with_spacer(letter_grid_space)
+		.with_flex_child(
+			Flex::row()
+				.with_spacer(letter_grid_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty, 4, 0),
+					letter_space,
+				)
+				.with_spacer(letter_grid_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty, 4, 1),
+					letter_space,
+				)
+				.with_spacer(letter_grid_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty, 4, 2),
+					letter_space,
+				)
+				.with_spacer(letter_grid_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty, 4, 3),
+					letter_space,
+				)
+				.with_spacer(letter_grid_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty, 4, 4),
+					letter_space,
+				)
+				.with_spacer(letter_grid_space),
+			letter_space,
+		)
+		.with_spacer(letter_grid_space)
+		.with_flex_child(
+			Flex::row()
+				.with_spacer(letter_grid_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty, 5, 0),
+					letter_space,
+				)
+				.with_spacer(letter_grid_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty, 5, 1),
+					letter_space,
+				)
+				.with_spacer(letter_grid_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty, 5, 2),
+					letter_space,
+				)
+				.with_spacer(letter_grid_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty, 5, 3),
+					letter_space,
+				)
+				.with_spacer(letter_grid_space)
+				.with_flex_child(
+					letter_box(" ".to_string(), LetterState::Empty, 5, 4),
 					letter_space,
 				)
 				.with_spacer(letter_grid_space),
@@ -504,48 +471,50 @@ pub fn main() {
 		.title(LocalizedString::new("app-title").with_placeholder("wobble"));
 
 	let calc_state = WobbleState {
-		line1: (
-			('w', LetterState::NotFound),
-			('o', LetterState::Correct),
-			('b', LetterState::WrongSpot),
-			('b', LetterState::NotFound),
-			('l', LetterState::Correct),
-		),
-		line2: (
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		),
-		line3: (
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		),
-		line4: (
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		),
-		line5: (
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		),
-		line6: (
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		),
+		guesses: [
+			[
+				('w', LetterState::NotFound),
+				('o', LetterState::Correct),
+				('b', LetterState::WrongSpot),
+				('b', LetterState::NotFound),
+				('l', LetterState::Correct),
+			],
+			[
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+			],
+			[
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+			],
+			[
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+			],
+			[
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+			],
+			[
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+			],
+		],
 	};
 
 	AppLauncher::with_window(window)
