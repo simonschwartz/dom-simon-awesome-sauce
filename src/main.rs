@@ -115,6 +115,72 @@ struct WobbleState {
 // 	}
 // }
 
+fn get_current_position(guesses: &[Guess; 6]) -> (usize, usize) {
+	let mut guess_word = 0;
+	let mut guess_letter = 0;
+
+	'outer: for (guess_worda, word) in guesses.iter().enumerate() {
+		for (guess_lettera, (_, letter_state)) in word.iter().enumerate() {
+			println!("{} {} {:?}", guess_worda, guess_lettera, letter_state);
+			if *letter_state == LetterState::Input {
+				guess_word = guess_worda;
+				guess_letter = guess_lettera;
+				break 'outer;
+			}
+		}
+	}
+	println!("{} {}", guess_word, guess_letter);
+	(guess_word, guess_letter)
+}
+
+#[test]
+fn get_current_position_test() {
+	assert_eq!(get_current_position(&[
+		[
+			('w', LetterState::NotFound),
+			('o', LetterState::Correct),
+			('b', LetterState::WrongSpot),
+			('b', LetterState::NotFound),
+			('l', LetterState::Correct),
+		],
+		[
+			('D', LetterState::Set),
+			(' ', LetterState::Input),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+		],
+		[
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+		],
+		[
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+		],
+		[
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+		],
+		[
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+		],
+	]), (1, 1));
+}
+
 fn letter_key(letter: char) -> impl Widget<WobbleState> {
 	let rect = Painter::new(|ctx, _, _| {
 		let bounds = ctx.size().to_rect().to_rounded_rect(4.0);
@@ -138,8 +204,7 @@ fn letter_key(letter: char) -> impl Widget<WobbleState> {
 		.expand()
 		.on_click(move |_ctx, data: &mut WobbleState, _| {
 			// call function to analyze data.guesses and return (guess_word,guess_letter) coordinates
-			let guess_word = 1;
-			let guess_letter = 1;
+			let (guess_word, guess_letter) = get_current_position(&data.guesses);
 			data.guesses[guess_word][guess_letter].0 = letter;
 		})
 }
@@ -171,10 +236,12 @@ fn letter_box(guess_word: usize, guess_letter: usize) -> impl Widget<WobbleState
 	let rect = Painter::new(move |ctx, guesses: &[Guess; 6], _| {
 		let bounds = ctx.size().to_rect();
 		let (bg, color) = match &guesses[guess_word][guess_letter].1 {
-			LetterState::Empty => (
-				Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF),
-				Color::rgba8(0x00, 0x00, 0x00, 0x33),
-			),
+			LetterState::Empty => {
+				(
+					Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF),
+					Color::rgba8(0x00, 0x00, 0x00, 0x33),
+				)
+			},
 			LetterState::Set => (
 				Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF),
 				Color::rgba8(0x00, 0x00, 0x00, 0x33),
