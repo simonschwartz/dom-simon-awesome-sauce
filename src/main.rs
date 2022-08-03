@@ -135,50 +135,53 @@ fn get_current_position(guesses: &[Guess; 6]) -> (usize, usize) {
 
 #[test]
 fn get_current_position_test() {
-	assert_eq!(get_current_position(&[
-		[
-			('w', LetterState::NotFound),
-			('o', LetterState::Correct),
-			('b', LetterState::WrongSpot),
-			('b', LetterState::NotFound),
-			('l', LetterState::Correct),
-		],
-		[
-			('D', LetterState::Set),
-			(' ', LetterState::Input),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		],
-		[
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		],
-		[
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		],
-		[
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		],
-		[
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		],
-	]), (1, 1));
+	assert_eq!(
+		get_current_position(&[
+			[
+				('w', LetterState::NotFound),
+				('o', LetterState::Correct),
+				('b', LetterState::WrongSpot),
+				('b', LetterState::NotFound),
+				('l', LetterState::Correct),
+			],
+			[
+				('D', LetterState::Set),
+				(' ', LetterState::Input),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+			],
+			[
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+			],
+			[
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+			],
+			[
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+			],
+			[
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+				(' ', LetterState::Empty),
+			],
+		]),
+		(1, 1)
+	);
 }
 
 fn letter_key(letter: char) -> impl Widget<WobbleState> {
@@ -236,12 +239,10 @@ fn letter_box(guess_word: usize, guess_letter: usize) -> impl Widget<WobbleState
 	let rect = Painter::new(move |ctx, guesses: &[Guess; 6], _| {
 		let bounds = ctx.size().to_rect();
 		let (bg, color) = match &guesses[guess_word][guess_letter].1 {
-			LetterState::Empty => {
-				(
-					Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF),
-					Color::rgba8(0x00, 0x00, 0x00, 0x33),
-				)
-			},
+			LetterState::Empty => (
+				Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF),
+				Color::rgba8(0x00, 0x00, 0x00, 0x33),
+			),
 			LetterState::Set => (
 				Color::rgba8(0xFF, 0xFF, 0xFF, 0xFF),
 				Color::rgba8(0x00, 0x00, 0x00, 0x33),
