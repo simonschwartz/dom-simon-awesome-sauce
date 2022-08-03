@@ -116,12 +116,12 @@ struct WobbleState {
 // }
 
 fn get_current_position(guesses: &[Guess; 6]) -> (usize, usize) {
-	let mut guess_word = 0;
-	let mut guess_letter = 0;
+	// defaulting to the end of both row and column here feels safer than going to the top and possibly overriding existing values?
+	let mut guess_word = 5;
+	let mut guess_letter = 4;
 
 	'outer: for (guess_worda, word) in guesses.iter().enumerate() {
 		for (guess_lettera, (_, letter_state)) in word.iter().enumerate() {
-			println!("{} {} {:?}", guess_worda, guess_lettera, letter_state);
 			if *letter_state == LetterState::Input {
 				guess_word = guess_worda;
 				guess_letter = guess_lettera;
@@ -129,59 +129,79 @@ fn get_current_position(guesses: &[Guess; 6]) -> (usize, usize) {
 			}
 		}
 	}
-	println!("{} {}", guess_word, guess_letter);
+
 	(guess_word, guess_letter)
 }
 
 #[test]
 fn get_current_position_test() {
-	assert_eq!(
-		get_current_position(&[
-			[
-				('w', LetterState::NotFound),
-				('o', LetterState::Correct),
-				('b', LetterState::WrongSpot),
-				('b', LetterState::NotFound),
-				('l', LetterState::Correct),
-			],
-			[
-				('D', LetterState::Set),
-				(' ', LetterState::Input),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-			],
-			[
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-			],
-			[
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-			],
-			[
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-			],
-			[
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-				(' ', LetterState::Empty),
-			],
-		]),
-		(1, 1)
-	);
+	// created an empty default state for our data
+	let fresh_state = [
+		[
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+		],
+		[
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+		],
+		[
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+		],
+		[
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+		],
+		[
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+		],
+		[
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+			(' ', LetterState::Empty),
+		],
+	];
+
+	// now for each test we clone the fresh state from above and tweak it to our liking
+	let mut state = fresh_state.clone();
+	state[0][3] = (' ', LetterState::Input);
+	assert_eq!(get_current_position(&state), (0, 3));
+
+	state = fresh_state.clone();
+	state[1][2] = (' ', LetterState::Input);
+	assert_eq!(get_current_position(&state), (1, 2));
+
+	// edge cases
+	state = fresh_state.clone();
+	state[0][0] = (' ', LetterState::Input);
+	assert_eq!(get_current_position(&state), (0, 0));
+
+	state = fresh_state.clone();
+	state[5][4] = (' ', LetterState::Input);
+	assert_eq!(get_current_position(&state), (5, 4));
+
+	// what if we get a bad state passed in?
+	state = fresh_state.clone();
+	assert_eq!(get_current_position(&state), (5, 4));
 }
 
 fn letter_key(letter: char) -> impl Widget<WobbleState> {
