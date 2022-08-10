@@ -232,13 +232,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "212d0f5754cb6769937f4501cc0e67f4f4483c8d2c3e1e922ee9edbe4ab4c7c0"
 
 [[package]]
-name = "dom-simon-awesome-sauce"
-version = "0.1.0"
-dependencies = [
- "druid",
-]
-
-[[package]]
 name = "druid"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1515,6 +1508,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d129932f4644ac2396cb456385cbf9e63b5b30c6e8dc4820bdca4eb082037a5"
 dependencies = [
  "winapi",
+]
+
+[[package]]
+name = "wobble"
+version = "1.0.0"
+dependencies = [
+ "druid",
 ]
 
 [[package]]
