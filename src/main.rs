@@ -229,6 +229,13 @@ fn letter_key(letter: char) -> impl Widget<WobbleState> {
 			// call function to analyze data.guesses and return (guess_word,guess_letter) coordinates
 			let (guess_word, guess_letter) = get_current_position(&data.guesses);
 			data.guesses[guess_word][guess_letter].0 = letter;
+			let next_guess_letter = if guess_letter == 4 {
+				4
+			} else {
+				guess_letter + 1
+			};
+			data.guesses[guess_word][guess_letter].1 = LetterState::Set;
+			data.guesses[guess_word][next_guess_letter].1 = LetterState::Input;
 		})
 }
 
@@ -253,6 +260,42 @@ fn button(label: String) -> impl Widget<WobbleState> {
 		.background(rect)
 		.expand()
 		.on_click(move |_ctx, _data: &mut WobbleState, _env| {})
+}
+
+fn del_key(label: String) -> impl Widget<WobbleState> {
+	let rect = Painter::new(|ctx, _, _| {
+		let bounds = ctx.size().to_rect().to_rounded_rect(2.0);
+
+		ctx.fill(bounds, &Color::rgba8(0xAA, 0xAA, 0xAA, 0x99));
+
+		if ctx.is_hot() {
+			ctx.stroke(bounds, &Color::rgba8(0x00, 0x00, 0x00, 0x44), 1.0);
+		}
+
+		if ctx.is_active() {
+			ctx.fill(bounds, &Color::rgba8(0x00, 0xFF, 0x00, 0xFF));
+		}
+	});
+
+	Label::new(format!("{}", label))
+		.with_text_size(24.0)
+		.center()
+		.background(rect)
+		.expand()
+		.on_click(move |_ctx, data: &mut WobbleState, _env| {
+			let (guess_word, guess_letter) = get_current_position(&data.guesses);
+			let next_guess_letter = if guess_letter == 0 {
+				0
+			} else if guess_letter == 4 && data.guesses[guess_word][guess_letter].0 != ' ' {
+				4
+			} else {
+				guess_letter - 1
+			};
+			data.guesses[guess_word][guess_letter].0 = ' ';
+			data.guesses[guess_word][guess_letter].1 = LetterState::Empty;
+			data.guesses[guess_word][next_guess_letter].0 = ' ';
+			data.guesses[guess_word][next_guess_letter].1 = LetterState::Input;
+		})
 }
 
 fn letter_box(guess_word: usize, guess_letter: usize) -> impl Widget<WobbleState> {
@@ -480,7 +523,7 @@ fn build_layout() -> impl Widget<WobbleState> {
 				.with_spacer(key_space)
 				.with_flex_child(letter_key('m'), key_space)
 				.with_spacer(1.0)
-				.with_flex_child(button("del".to_string()), 1.0),
+				.with_flex_child(del_key("del".to_string()), 1.0),
 			0.3,
 		)
 }
