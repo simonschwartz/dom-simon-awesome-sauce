@@ -136,50 +136,7 @@ fn get_current_position(guesses: &[Guess; 6]) -> (usize, usize) {
 #[test]
 fn get_current_position_test() {
 	// created an empty default state for our data
-	let fresh_state = [
-		[
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		],
-		[
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		],
-		[
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		],
-		[
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		],
-		[
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		],
-		[
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-			(' ', LetterState::Empty),
-		],
-	];
+	let fresh_state = [[(' ', LetterState::Empty); 5]; 6];
 
 	// now for each test we clone the fresh state from above and tweak it to our liking
 	let mut state = fresh_state.clone();
