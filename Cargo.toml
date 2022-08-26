@@ -2,8 +2,22 @@
 name = "wobble"
 version = "1.0.0"
 edition = "2021"
+description = "A wordle implementation in rust"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 druid = "0.7.0"
+rand = "0.8.5"
+
+[package.metadata.bundle]
+name = "wobble"
+identifier = "com.games.wobble"
+icon = ["assets/1024x1024@2x.png"]
+copyright = "Copyright (c) Simone-the-chosen and Dom-the-bald 2022. All rights reserved."
+category = "Word Game"
+short_description = "A wordle implementation in rust"
+long_description = """
+You know Wordle... the annoying thing that everyone keeps posting about?
+This is that just less good
+"""
