@@ -13,6 +13,7 @@ rand = "0.8.5"
 [package.metadata.bundle]
 name = "wobble"
 identifier = "com.games.wobble"
+osx_minimum_system_version = "12.5"
 icon = ["assets/1024x1024@2x.png"]
 copyright = "Copyright (c) Simone-the-chosen and Dom-the-bald 2022. All rights reserved."
 category = "Word Game"
