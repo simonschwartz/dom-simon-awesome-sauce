@@ -36,6 +36,21 @@ pub struct WobbleState {
 	msg: String,
 }
 
+impl Default for WobbleState {
+	fn default() -> Self {
+		let mut guesses = [[(' ', LetterState::Empty); 5]; 6];
+		guesses[0][0].1 = LetterState::Input;
+
+		WobbleState {
+			guesses,
+			word: String::from(*db::ANSWERS.choose(&mut rand::thread_rng()).unwrap()),
+			history: String::from(""),
+			finished: GameState::InProgress,
+			msg: String::new(),
+		}
+	}
+}
+
 impl WobbleState {
 	fn get_active_coordinates(&self) -> (usize, usize, usize, usize) {
 		// defaulting to the end of both row and column here feels safer than going to the top and possibly overriding existing values?
@@ -151,11 +166,7 @@ impl WobbleState {
 	}
 
 	fn restart(&mut self) {
-		self.guesses = [[(' ', LetterState::Empty); 5]; 6];
-		self.guesses[0][0].1 = LetterState::Input;
-		self.word = String::from(*db::ANSWERS.choose(&mut rand::thread_rng()).unwrap());
-		self.history = String::from("");
-		self.finished = GameState::InProgress;
+		*self = WobbleState::default();
 	}
 }
 
@@ -428,15 +439,6 @@ pub fn main() {
 		.resizable(true)
 		.title(LocalizedString::new("app-title").with_placeholder("wobble"));
 
-	let mut calc_state = WobbleState {
-		guesses: [[(' ', LetterState::Empty); 5]; 6],
-		word: String::from(*db::ANSWERS.choose(&mut rand::thread_rng()).unwrap()),
-		history: String::from(""),
-		finished: GameState::InProgress,
-		msg: String::new(),
-	};
-	calc_state.guesses[0][0].1 = LetterState::Input;
-
 	AppLauncher::with_window(window)
 		.use_simple_logger()
 		.configure_env(|env, _| {
@@ -447,6 +449,6 @@ pub fn main() {
 			env.set(theme::LABEL_COLOR, Color::BLACK);
 			env.set(druid::theme::WINDOW_BACKGROUND_COLOR, Color::WHITE);
 		})
-		.launch(calc_state)
+		.launch(WobbleState::default())
 		.expect("launch failed");
 }
