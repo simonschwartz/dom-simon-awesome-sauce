@@ -149,6 +149,14 @@ impl WobbleState {
 			}
 		}
 	}
+
+	fn restart(&mut self) {
+		self.guesses = [[(' ', LetterState::Empty); 5]; 6];
+		self.guesses[0][0].1 = LetterState::Input;
+		self.word = String::from(*db::ANSWERS.choose(&mut rand::thread_rng()).unwrap());
+		self.history = String::from("");
+		self.finished = GameState::InProgress;
+	}
 }
 
 #[test]
@@ -335,12 +343,8 @@ fn restart_btn(label: String) -> impl Widget<WobbleState> {
 		.center()
 		.background(rect)
 		.expand()
-		.on_click(move |_ctx, data: &mut WobbleState, _env| {
-			data.guesses = [[(' ', LetterState::Empty); 5]; 6];
-			data.guesses[0][0].1 = LetterState::Input;
-			data.word = String::from(*db::ANSWERS.choose(&mut rand::thread_rng()).unwrap());
-			data.history = String::from("");
-			data.finished = GameState::InProgress;
+		.on_click(|_ctx, data: &mut WobbleState, _env| {
+			data.restart();
 		})
 }
 
